@@ -118,7 +118,7 @@ use std::ops::{Add, Div, Mul, Sub};
 impl Add for Vec3 {
     type Output = Self;
 
-    fn add(self, rhs: Self) -> Self {
+    fn add(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
@@ -130,7 +130,7 @@ impl Add for Vec3 {
 impl Add<f64> for Vec3 {
     type Output = Self;
 
-    fn add(self, rhs: f64) -> Self {
+    fn add(self, rhs: f64) -> Self::Output {
         Self {
             x: self.x + rhs,
             y: self.y + rhs,
@@ -139,10 +139,22 @@ impl Add<f64> for Vec3 {
     }
 }
 
+impl Add<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn add(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self + rhs.x,
+            y: self + rhs.y,
+            z: self + rhs.z,
+        }
+    }
+}
+
 impl Sub for Vec3 {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self {
+    fn sub(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
@@ -154,7 +166,7 @@ impl Sub for Vec3 {
 impl Sub<f64> for Vec3 {
     type Output = Self;
 
-    fn sub(self, rhs: f64) -> Self {
+    fn sub(self, rhs: f64) -> Self::Output {
         Self {
             x: self.x - rhs,
             y: self.y - rhs,
@@ -166,7 +178,7 @@ impl Sub<f64> for Vec3 {
 impl Mul for Vec3 {
     type Output = Self;
 
-    fn mul(self, rhs: Self) -> Self {
+    fn mul(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x * rhs.x,
             y: self.y * rhs.y,
@@ -178,7 +190,7 @@ impl Mul for Vec3 {
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
-    fn mul(self, rhs: f64) -> Self {
+    fn mul(self, rhs: f64) -> Self::Output {
         Self {
             x: self.x * rhs,
             y: self.y * rhs,
@@ -187,10 +199,22 @@ impl Mul<f64> for Vec3 {
     }
 }
 
+impl Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self * rhs.x,
+            y: self * rhs.y,
+            z: self * rhs.z,
+        }
+    }
+}
+
 impl Div for Vec3 {
     type Output = Self;
 
-    fn div(self, rhs: Self) -> Self {
+    fn div(self, rhs: Self) -> Self::Output {
         Self {
             x: self.x / rhs.x,
             y: self.y / rhs.y,
@@ -202,7 +226,7 @@ impl Div for Vec3 {
 impl Div<f64> for Vec3 {
     type Output = Self;
 
-    fn div(self, rhs: f64) -> Self {
+    fn div(self, rhs: f64) -> Self::Output {
         Self {
             x: self.x / rhs,
             y: self.y / rhs,
