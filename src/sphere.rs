@@ -4,15 +4,21 @@ pub struct Sphere {
     centre: Ray,
     radius: f64,
     material: Rc<dyn Material>,
+    bbox: AABB,
 }
 
 impl Sphere {
     pub fn new(centre1: Point3, centre2: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
         let radius = radius.max(0.0);
+        let rvec = Vec3::new(radius, radius, radius);
+        let centre = Ray::new(centre1, centre2 - centre1, 0.0);
+        let box1 = AABB::from_points(&(centre.at(0.0) - rvec), &(centre.at(0.0) + rvec));
+        let box2 = AABB::from_points(&(centre.at(1.0) - rvec), &(centre.at(1.0) + rvec));
         Self {
-            centre: Ray::new(centre1, centre2 - centre1, 0.0),
+            centre,
             radius,
             material,
+            bbox: AABB::from_boxes(&box1, &box2),
         }
     }
 }
@@ -44,5 +50,9 @@ impl Hittable for Sphere {
 
             true
         }
+    }
+
+    fn bounding_box(&self) -> AABB {
+        self.bbox
     }
 }

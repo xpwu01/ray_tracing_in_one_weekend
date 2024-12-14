@@ -35,6 +35,21 @@ impl Interval {
     pub fn clamp(&self, x: f64) -> f64 {
         x.min(self.max).max(self.min)
     }
+
+    pub fn expand(&self, delta: f64) -> Self {
+        let padding = delta * 0.5;
+        Self {
+            min: self.min - padding,
+            max: self.max + padding,
+        }
+    }
+
+    pub fn enclosing(a: &Self, b: &Self) -> Self {
+        Self {
+            min: a.min.min(b.min),
+            max: a.max.max(b.max),
+        }
+    }
 }
 
 impl std::default::Default for Interval {

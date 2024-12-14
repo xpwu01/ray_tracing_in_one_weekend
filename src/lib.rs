@@ -1,3 +1,5 @@
+pub mod aabb;
+pub mod bvh;
 pub mod camera;
 pub mod colour;
 pub mod hittable;
@@ -8,6 +10,8 @@ pub mod ray;
 pub mod sphere;
 pub mod vec3;
 
+pub use aabb::*;
+pub use bvh::*;
 pub use camera::*;
 pub use colour::*;
 pub use hittable::*;
@@ -31,4 +35,8 @@ pub fn random_double() -> f64 {
 
 pub fn random_double_range(min: f64, max: f64) -> f64 {
     min + (max - min) * random_double()
+}
+
+pub fn random_int_range(min: i32, max: i32) -> i32 {
+    random_double_range(min as f64, (max + 1) as f64) as i32
 }

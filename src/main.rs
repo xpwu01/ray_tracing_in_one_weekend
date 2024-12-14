@@ -1,10 +1,10 @@
 fn main() {
     use ray_tracing_in_one_weekend::*;
 
-    let mut world = HittableList::new();
+    let mut world = HittableList::empty();
 
     let ground_material = Rc::new(Lambertian::new(Colour::new(0.5, 0.5, 0.5)));
-    world.add(Box::new(Sphere::new(
+    world.add(Rc::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -35,13 +35,13 @@ fn main() {
                     Rc::new(Dielectric::new(1.5))
                 };
 
-                world.add(Box::new(Sphere::new(centre, centre2, 0.2, sphere_material)));
+                world.add(Rc::new(Sphere::new(centre, centre2, 0.2, sphere_material)));
             }
         }
     }
 
     let material1 = Rc::new(Dielectric::new(1.5));
-    world.add(Box::new(Sphere::new(
+    world.add(Rc::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),
         Point3::new(0.0, 1.0, 0.0),
         1.0,
@@ -49,7 +49,7 @@ fn main() {
     )));
 
     let material2 = Rc::new(Lambertian::new(Colour::new(0.4, 0.2, 0.1)));
-    world.add(Box::new(Sphere::new(
+    world.add(Rc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
         Point3::new(-4.0, 1.0, 0.0),
         1.0,
@@ -57,12 +57,14 @@ fn main() {
     )));
 
     let material3 = Rc::new(Metal::new(Colour::new(0.7, 0.6, 0.5), 0.0));
-    world.add(Box::new(Sphere::new(
+    world.add(Rc::new(Sphere::new(
         Point3::new(4.0, 1.0, 0.0),
         Point3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
     )));
+
+    let world = HittableList::new(Rc::new(BVHNode::from_list(world)));
 
     let aspect_ratio: f64 = 16.0 / 9.0;
     let image_width: u32 = 400;

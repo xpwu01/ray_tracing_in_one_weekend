@@ -1,17 +1,26 @@
 use crate::*;
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>,
+    pub objects: Vec<Rc<dyn Hittable>>,
+    bbox: AABB,
 }
 
 impl HittableList {
-    pub fn new() -> Self {
+    pub fn new(object: Rc<dyn Hittable>) -> Self {
+        let bbox = AABB::from_boxes(&AABB::empty(), &object.bounding_box());
+        let objects = vec![object];
+        Self { objects, bbox }
+    }
+
+    pub fn empty() -> Self {
         Self {
             objects: Vec::new(),
+            bbox: AABB::empty(),
         }
     }
 
-    pub fn add(&mut self, object: Box<dyn Hittable>) {
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+        self.bbox = AABB::from_boxes(&self.bbox, &object.bounding_box());
         self.objects.push(object);
     }
 
@@ -22,7 +31,7 @@ impl HittableList {
 
 impl Default for HittableList {
     fn default() -> Self {
-        Self::new()
+        Self::empty()
     }
 }
 
@@ -41,5 +50,9 @@ impl Hittable for HittableList {
         }
 
         hit_anything
+    }
+
+    fn bounding_box(&self) -> AABB {
+        self.bbox
     }
 }
