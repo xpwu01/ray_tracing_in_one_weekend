@@ -18,8 +18,8 @@ pub use ray::*;
 pub use sphere::*;
 pub use vec3::*;
 
-pub use std::rc::Rc;
 pub use std::f64::consts::PI;
+pub use std::rc::Rc;
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0

@@ -108,8 +108,9 @@ impl Camera {
             self.defocus_disk_sample()
         };
         let ray_direction = pixel_sample - ray_origin;
+        let ray_time = random_double();
 
-        Ray::new(ray_origin, ray_direction)
+        Ray::new(ray_origin, ray_direction, ray_time)
     }
 
     fn sample_square() -> Vec3 {
@@ -129,7 +130,7 @@ impl Camera {
         let mut rec = HitRecord::new();
 
         if world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
-            let mut scattered = Ray::new(Point3::zero(), Vec3::zero());
+            let mut scattered = Ray::new(Point3::zero(), Vec3::zero(), 0.0);
             let mut attenuation = Colour::zero();
             if (rec.material).scatter(&ray, &rec, &mut attenuation, &mut scattered) {
                 return attenuation * Self::ray_colour(scattered, depth - 1, world);

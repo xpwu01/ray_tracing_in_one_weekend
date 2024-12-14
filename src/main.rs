@@ -6,6 +6,7 @@ fn main() {
     let ground_material = Rc::new(Lambertian::new(Colour::new(0.5, 0.5, 0.5)));
     world.add(Box::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
+        Point3::new(0.0, -1000.0, 0.0),
         1000.0,
         ground_material,
     )));
@@ -19,9 +20,12 @@ fn main() {
                 b as f64 + 0.9 * random_double(),
             );
 
+            let mut centre2 = centre;
+
             if (centre - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 let sphere_material: Rc<dyn Material> = if choose_mat < 0.8 {
                     let albedo = Colour::random() * Colour::random();
+                    centre2 += Vec3::new(0.0, random_double_range(0.0, 0.5), 0.0);
                     Rc::new(Lambertian::new(albedo))
                 } else if choose_mat < 0.95 {
                     let albedo = Colour::random_range(0.5, 1.0);
@@ -31,13 +35,14 @@ fn main() {
                     Rc::new(Dielectric::new(1.5))
                 };
 
-                world.add(Box::new(Sphere::new(centre, 0.2, sphere_material)));
+                world.add(Box::new(Sphere::new(centre, centre2, 0.2, sphere_material)));
             }
         }
     }
 
     let material1 = Rc::new(Dielectric::new(1.5));
     world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 1.0, 0.0),
         Point3::new(0.0, 1.0, 0.0),
         1.0,
         material1,
@@ -46,6 +51,7 @@ fn main() {
     let material2 = Rc::new(Lambertian::new(Colour::new(0.4, 0.2, 0.1)));
     world.add(Box::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
+        Point3::new(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
@@ -53,13 +59,14 @@ fn main() {
     let material3 = Rc::new(Metal::new(Colour::new(0.7, 0.6, 0.5), 0.0));
     world.add(Box::new(Sphere::new(
         Point3::new(4.0, 1.0, 0.0),
+        Point3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
     )));
 
     let aspect_ratio: f64 = 16.0 / 9.0;
-    let image_width: u32 = 1200;
-    let samples_per_pixel: u32 = 500;
+    let image_width: u32 = 400;
+    let samples_per_pixel: u32 = 100;
     let max_depth: u32 = 50;
 
     let vfov: f64 = 20.0;

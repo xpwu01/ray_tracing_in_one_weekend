@@ -3,7 +3,7 @@ use crate::*;
 pub trait Material {
     fn scatter(
         &self,
-        r_in: &Ray,
+        ray_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Colour,
         scattered: &mut Ray,
@@ -24,7 +24,7 @@ impl Lambertian {
 impl Material for Lambertian {
     fn scatter(
         &self,
-        _r_in: &Ray,
+        ray_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Colour,
         scattered: &mut Ray,
@@ -35,7 +35,7 @@ impl Material for Lambertian {
             scatter_direction = rec.normal;
         }
 
-        *scattered = Ray::new(rec.p, scatter_direction);
+        *scattered = Ray::new(rec.p, scatter_direction, ray_in.time());
         *attenuation = self.albedo;
         true
     }
@@ -59,14 +59,14 @@ impl Metal {
 impl Material for Metal {
     fn scatter(
         &self,
-        r_in: &Ray,
+        ray_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Colour,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = Vec3::reflect(&r_in.direction(), &rec.normal).unit_vector()
+        let reflected = Vec3::reflect(&ray_in.direction(), &rec.normal).unit_vector()
             + Vec3::random_unit_vector() * self.fuzz;
-        *scattered = Ray::new(rec.p, reflected);
+        *scattered = Ray::new(rec.p, reflected, ray_in.time());
         *attenuation = self.albedo;
         scattered.direction().dot(rec.normal) > 0.0
     }
@@ -91,7 +91,7 @@ impl Dielectric {
 impl Material for Dielectric {
     fn scatter(
         &self,
-        r_in: &Ray,
+        ray_in: &Ray,
         rec: &HitRecord,
         attenuation: &mut Colour,
         scattered: &mut Ray,
@@ -102,7 +102,7 @@ impl Material for Dielectric {
         } else {
             self.refractive_index
         };
-        let unit_direction = r_in.direction().unit_vector();
+        let unit_direction = ray_in.direction().unit_vector();
         let cos_theta = (-unit_direction).dot(rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
@@ -113,7 +113,7 @@ impl Material for Dielectric {
                 Vec3::refract(&unit_direction, &rec.normal, refraction_ratio)
             };
 
-        *scattered = Ray::new(rec.p, direction);
+        *scattered = Ray::new(rec.p, direction, ray_in.time());
         true
     }
 }
