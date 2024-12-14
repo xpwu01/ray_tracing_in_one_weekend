@@ -7,8 +7,7 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
-    pub fn new(objects: &Vec<Rc<dyn Hittable>>, start: usize, end: usize) -> Self {
-        let mut objects = objects.clone();
+    pub fn new(objects: &mut Vec<Rc<dyn Hittable>>, start: usize, end: usize) -> Self {
         let mut bbox = AABB::empty();
         for i in start..end {
             let object_bbox = objects[i].bounding_box();
@@ -33,8 +32,8 @@ impl BVHNode {
                     }
                 });
                 let mid = start + object_span / 2;
-                let left: Rc<dyn Hittable> = Rc::new(BVHNode::new(&objects, start, mid));
-                let right: Rc<dyn Hittable> = Rc::new(BVHNode::new(&objects, mid, end));
+                let left: Rc<dyn Hittable> = Rc::new(BVHNode::new(objects, start, mid));
+                let right: Rc<dyn Hittable> = Rc::new(BVHNode::new(objects, mid, end));
                 (left, right)
             }
         };
@@ -43,8 +42,9 @@ impl BVHNode {
     }
 
     pub fn from_list(list: HittableList) -> Self {
-        let objects = list.objects;
-        Self::new(&objects, 0, objects.len())
+        let mut objects = list.objects;
+        let end = objects.len();
+        Self::new(&mut objects, 0, end)
     }
 
     fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis: usize) -> std::cmp::Ordering {
