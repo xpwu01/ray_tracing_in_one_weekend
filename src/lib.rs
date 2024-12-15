@@ -8,6 +8,7 @@ pub mod interval;
 pub mod material;
 pub mod ray;
 pub mod sphere;
+pub mod texture;
 pub mod vec3;
 
 pub use aabb::*;
@@ -20,6 +21,7 @@ pub use interval::*;
 pub use material::*;
 pub use ray::*;
 pub use sphere::*;
+pub use texture::*;
 pub use vec3::*;
 
 pub use std::f64::consts::PI;

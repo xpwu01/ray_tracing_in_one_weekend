@@ -10,14 +10,19 @@ pub trait Material {
     ) -> bool;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Lambertian {
-    albedo: Colour,
+    texture: Rc<dyn Texture>,
 }
 
 impl Lambertian {
-    pub fn new(albedo: Colour) -> Self {
-        Self { albedo }
+    pub fn new(texture: Rc<dyn Texture>) -> Self {
+        Self { texture }
+    }
+
+    pub fn from_colour(colour: Colour) -> Self {
+        Self {
+            texture: Rc::new(SolidColour::new(colour)),
+        }
     }
 }
 
@@ -36,7 +41,7 @@ impl Material for Lambertian {
         }
 
         *scattered = Ray::new(rec.p, scatter_direction, ray_in.time());
-        *attenuation = self.albedo;
+        *attenuation = self.texture.value(rec.u, rec.v, &rec.p);
         true
     }
 }

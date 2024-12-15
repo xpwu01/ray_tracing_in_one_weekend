@@ -3,7 +3,12 @@ fn main() {
 
     let mut world = HittableList::empty();
 
-    let ground_material = Rc::new(Lambertian::new(Colour::new(0.5, 0.5, 0.5)));
+    let checker = Rc::new(CheckerTexture::from_colours(
+        0.32,
+        Colour::new(0.2, 0.3, 0.1),
+        Colour::new(0.9, 0.9, 0.9),
+    ));
+    let ground_material = Rc::new(Lambertian::new(checker));
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         Point3::new(0.0, -1000.0, 0.0),
@@ -26,7 +31,7 @@ fn main() {
                 let sphere_material: Rc<dyn Material> = if choose_mat < 0.8 {
                     let albedo = Colour::random() * Colour::random();
                     centre2 += Vec3::new(0.0, random_double_range(0.0, 0.5), 0.0);
-                    Rc::new(Lambertian::new(albedo))
+                    Rc::new(Lambertian::from_colour(albedo))
                 } else if choose_mat < 0.95 {
                     let albedo = Colour::random_range(0.5, 1.0);
                     let fuzz = random_double_range(0.0, 0.5);
@@ -48,7 +53,7 @@ fn main() {
         material1,
     )));
 
-    let material2 = Rc::new(Lambertian::new(Colour::new(0.4, 0.2, 0.1)));
+    let material2 = Rc::new(Lambertian::from_colour(Colour::new(0.4, 0.2, 0.1)));
     world.add(Rc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
         Point3::new(-4.0, 1.0, 0.0),
