@@ -59,3 +59,35 @@ impl Texture for CheckerTexture {
         }
     }
 }
+
+pub struct ImageTexture {
+    image: RtwImage,
+}
+
+impl ImageTexture {
+    pub fn new(image: RtwImage) -> Self {
+        Self { image }
+    }
+}
+
+impl Texture for ImageTexture {
+    fn value(&self, u: f64, v: f64, _p: &Point3) -> Colour {
+        if self.image.height() <= 0 {
+            return Colour::new(0.0, 1.0, 1.0);
+        }
+
+        let u = Interval::new(0.0, 1.0).clamp(u);
+        let v = 1.0 - Interval::new(0.0, 1.0).clamp(v);
+
+        let i = (u * self.image.width() as f64) as i32;
+        let j = (v * self.image.height() as f64) as i32;
+        let pixel = self.image.pixel_data(i, j);
+
+        let colour_scale = 1.0 / 255.0;
+        Colour::new(
+            colour_scale * pixel[0] as f64,
+            colour_scale * pixel[1] as f64,
+            colour_scale * pixel[2] as f64,
+        )
+    }
+}

@@ -1,14 +1,21 @@
-fn main() {
-    use ray_tracing_in_one_weekend::*;
+use ray_tracing_in_one_weekend::*;
 
+fn main() {
+    let case = 3;
+
+    match case {
+        1 => bouncing_spheres(),
+        2 => checkered_spheres(),
+        3 => earth(),
+        _ => panic!("Invalid case"),
+    }
+}
+
+fn bouncing_spheres() {
     let mut world = HittableList::empty();
 
-    let checker = Rc::new(CheckerTexture::from_colours(
-        0.32,
-        Colour::new(0.2, 0.3, 0.1),
-        Colour::new(0.9, 0.9, 0.9),
-    ));
-    let ground_material = Rc::new(Lambertian::new(checker));
+    let ground_material = Rc::new(Lambertian::from_colour(Colour::new(0.5, 0.5, 0.5)));
+
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         Point3::new(0.0, -1000.0, 0.0),
@@ -98,4 +105,96 @@ fn main() {
     );
 
     cam.render(&world);
+}
+
+fn checkered_spheres() {
+    let mut world = HittableList::empty();
+
+    let checker = Rc::new(CheckerTexture::from_colours(
+        0.32,
+        Colour::new(0.2, 0.3, 0.1),
+        Colour::new(0.9, 0.9, 0.9),
+    ));
+
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -10.0, 0.0),
+        Point3::new(0.0, -10.0, 0.0),
+        10.0,
+        Rc::new(Lambertian::new(checker.clone())),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 10.0, 0.0),
+        Point3::new(0.0, 10.0, 0.0),
+        10.0,
+        Rc::new(Lambertian::new(checker)),
+    )));
+
+    let world = HittableList::new(Rc::new(BVHNode::from_list(world)));
+
+    let aspect_ratio: f64 = 16.0 / 9.0;
+    let image_width: u32 = 400;
+    let samples_per_pixel: u32 = 100;
+    let max_depth: u32 = 50;
+
+    let vfov: f64 = 20.0;
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+
+    let defocus_angle = 0.0;
+    let focus_distance = 10.0;
+
+    let cam = Camera::new(
+        aspect_ratio,
+        image_width,
+        max_depth,
+        samples_per_pixel,
+        vfov,
+        look_from,
+        look_at,
+        vup,
+        defocus_angle,
+        focus_distance,
+    );
+
+    cam.render(&world);
+}
+
+fn earth() {
+    let earth_texture = Rc::new(ImageTexture::new(RtwImage::new("earthmap.jpg").unwrap()));
+    let earth_surface = Rc::new(Lambertian::new(earth_texture));
+    let globe = Rc::new(Sphere::new(
+        Point3::zero(),
+        Point3::zero(),
+        2.0,
+        earth_surface,
+    ));
+
+    let aspect_ratio: f64 = 16.0 / 9.0;
+    let image_width: u32 = 400;
+    let samples_per_pixel: u32 = 100;
+    let max_depth: u32 = 50;
+
+    let vfov: f64 = 20.0;
+    let look_from = Point3::new(0.0, 0.0, 12.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+
+    let defocus_angle = 0.0;
+    let focus_distance = 10.0;
+
+    let cam = Camera::new(
+        aspect_ratio,
+        image_width,
+        max_depth,
+        samples_per_pixel,
+        vfov,
+        look_from,
+        look_at,
+        vup,
+        defocus_angle,
+        focus_distance,
+    );
+
+    cam.render(&HittableList::new(globe));
 }
