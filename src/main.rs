@@ -1,12 +1,13 @@
 use ray_tracing_in_one_weekend::*;
 
 fn main() {
-    let case = 3;
+    let case = 4;
 
     match case {
         1 => bouncing_spheres(),
         2 => checkered_spheres(),
         3 => earth(),
+        4 => perlin_spheres(),
         _ => panic!("Invalid case"),
     }
 }
@@ -197,4 +198,50 @@ fn earth() {
     );
 
     cam.render(&HittableList::new(globe));
+}
+
+fn perlin_spheres() {
+    let mut world = HittableList::empty();
+
+    let perlin_texture = Rc::new(NoiseTexture::<256>::new(4.0));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Rc::new(Lambertian::new(perlin_texture.clone())),
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Rc::new(Lambertian::new(perlin_texture)),
+    )));
+
+    let aspect_ratio: f64 = 16.0 / 9.0;
+    let image_width: u32 = 400;
+    let samples_per_pixel: u32 = 100;
+    let max_depth: u32 = 50;
+
+    let vfov: f64 = 20.0;
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+
+    let defocus_angle = 0.0;
+    let focus_distance = 10.0;
+
+    let cam = Camera::new(
+        aspect_ratio,
+        image_width,
+        max_depth,
+        samples_per_pixel,
+        vfov,
+        look_from,
+        look_at,
+        vup,
+        defocus_angle,
+        focus_distance,
+    );
+
+    cam.render(&world);
 }

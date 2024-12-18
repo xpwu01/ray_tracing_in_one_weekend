@@ -275,12 +275,54 @@ impl Neg for Vec3 {
     }
 }
 
-use std::ops::AddAssign;
+use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 use crate::random_double;
 
 impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         *self = *self + rhs;
+    }
+}
+
+impl AddAssign<f64> for Vec3 {
+    fn add_assign(&mut self, rhs: f64) {
+        *self = *self + rhs;
+    }
+}
+
+impl SubAssign for Vec3 {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = *self - rhs;
+    }
+}
+
+impl SubAssign<f64> for Vec3 {
+    fn sub_assign(&mut self, rhs: f64) {
+        *self = *self - rhs;
+    }
+}
+
+impl MulAssign for Vec3 {
+    fn mul_assign(&mut self, rhs: Self) {
+        *self = *self * rhs;
+    }
+}
+
+impl MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = *self * rhs;
+    }
+}
+
+impl DivAssign for Vec3 {
+    fn div_assign(&mut self, rhs: Self) {
+        *self = *self / rhs;
+    }
+}
+
+impl DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, rhs: f64) {
+        *self = *self / rhs;
     }
 }
