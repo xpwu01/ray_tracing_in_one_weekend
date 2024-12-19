@@ -1,13 +1,14 @@
 use ray_tracing_in_one_weekend::*;
 
 fn main() {
-    let case = 4;
+    let case = 5;
 
     match case {
         1 => bouncing_spheres(),
         2 => checkered_spheres(),
         3 => earth(),
         4 => perlin_spheres(),
+        5 => quads(),
         _ => panic!("Invalid case"),
     }
 }
@@ -224,6 +225,75 @@ fn perlin_spheres() {
 
     let vfov: f64 = 20.0;
     let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+
+    let defocus_angle = 0.0;
+    let focus_distance = 10.0;
+
+    let cam = Camera::new(
+        aspect_ratio,
+        image_width,
+        max_depth,
+        samples_per_pixel,
+        vfov,
+        look_from,
+        look_at,
+        vup,
+        defocus_angle,
+        focus_distance,
+    );
+
+    cam.render(&world);
+}
+
+fn quads() {
+    let mut world = HittableList::empty();
+
+    let left_red = Rc::new(Lambertian::from_colour(Colour::new(1.0, 0.2, 0.2)));
+    let back_green = Rc::new(Lambertian::from_colour(Colour::new(0.2, 1.0, 0.2)));
+    let right_blue = Rc::new(Lambertian::from_colour(Colour::new(0.2, 0.2, 1.0)));
+    let upper_orange = Rc::new(Lambertian::from_colour(Colour::new(1.0, 0.5, 0.0)));
+    let lower_teal = Rc::new(Lambertian::from_colour(Colour::new(0.2, 0.8, 0.8)));
+
+    world.add(Rc::new(Quad::new(
+        Point3::new(-3.0, -2.0, 5.0),
+        Vec3::new(0.0, 0.0, -4.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        left_red,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, -2.0, 0.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        back_green,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(3.0, -2.0, 1.0),
+        Vec3::new(0.0, 0.0, 4.0),
+        Vec3::new(0.0, 4.0, 0.0),
+        right_blue,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, 3.0, 1.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, 4.0),
+        upper_orange,
+    )));
+    world.add(Rc::new(Quad::new(
+        Point3::new(-2.0, -3.0, 5.0),
+        Vec3::new(4.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -4.0),
+        lower_teal,
+    )));
+
+    let aspect_ratio: f64 = 1.0;
+    let image_width: u32 = 400;
+    let samples_per_pixel: u32 = 100;
+    let max_depth: u32 = 50;
+
+    let vfov: f64 = 80.0;
+    let look_from = Point3::new(0.0, 0.0, 9.0);
     let look_at = Point3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
 
