@@ -2,9 +2,9 @@ use crate::*;
 
 #[derive(Clone, Copy, Debug)]
 pub struct AABB {
-    x: Interval,
-    y: Interval,
-    z: Interval,
+    pub x: Interval,
+    pub y: Interval,
+    pub z: Interval,
 }
 
 impl AABB {
@@ -116,5 +116,27 @@ impl AABB {
         if self.z.size() < delta {
             self.z.expand(delta);
         }
+    }
+}
+
+use std::ops::Add;
+
+impl Add<Vec3> for AABB {
+    type Output = Self;
+
+    fn add(self, rhs: Vec3) -> Self::Output {
+        Self {
+            x: self.x + rhs.x(),
+            y: self.y + rhs.y(),
+            z: self.z + rhs.z(),
+        }
+    }
+}
+
+impl Add<AABB> for Vec3 {
+    type Output = AABB;
+
+    fn add(self, rhs: AABB) -> Self::Output {
+        rhs + self
     }
 }

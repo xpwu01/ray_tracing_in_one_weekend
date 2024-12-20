@@ -22,6 +22,7 @@ pub struct Camera {
     pub focus_distance: f64,
     defocus_disk_u: Vec3,
     defocus_disk_v: Vec3,
+    pub background: Colour,
 }
 
 impl Camera {
@@ -36,6 +37,7 @@ impl Camera {
         vup: Vec3,
         defocus_angle: f64,
         focus_distance: f64,
+        background: Colour,
     ) -> Self {
         let pixel_samples_scale = 1.0 / samples_per_pixel as f64;
 
@@ -93,6 +95,7 @@ impl Camera {
             focus_distance,
             defocus_disk_u,
             defocus_disk_v,
+            background,
         }
     }
 
@@ -122,25 +125,31 @@ impl Camera {
         self.camera_centre + (self.defocus_disk_u * p[0]) + (self.defocus_disk_v * p[1])
     }
 
-    pub fn ray_colour(ray: Ray, depth: u32, world: &dyn Hittable) -> Colour {
+    pub fn ray_colour(&self, ray: Ray, depth: u32, world: &dyn Hittable) -> Colour {
         if depth == 0 {
             return Colour::zero();
         }
 
         let mut rec = HitRecord::new();
 
-        if world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
-            let mut scattered = Ray::new(Point3::zero(), Vec3::zero(), 0.0);
-            let mut attenuation = Colour::zero();
-            if (rec.material).scatter(&ray, &rec, &mut attenuation, &mut scattered) {
-                return attenuation * Self::ray_colour(scattered, depth - 1, world);
-            }
-            return Colour::zero();
+        if !world.hit(&ray, Interval::new(0.001, f64::INFINITY), &mut rec) {
+            return self.background;
         }
 
-        let unit_direction = ray.direction().unit_vector();
-        let a = 0.5 * (unit_direction.y() + 1.0);
-        Colour::new(1.0, 1.0, 1.0) * (1.0 - a) + Colour::new(0.5, 0.7, 1.0) * a
+        let mut scattered = Ray::new(Point3::zero(), Vec3::zero(), 0.0);
+        let mut attenuation = Colour::zero();
+        let colour_from_emission = rec.material.emitted(rec.u, rec.v, &rec.p);
+
+        if !rec
+            .material
+            .scatter(&ray, &rec, &mut attenuation, &mut scattered)
+        {
+            return colour_from_emission;
+        }
+
+        let colour_from_scatter = attenuation * self.ray_colour(scattered, depth - 1, world);
+
+        colour_from_emission + colour_from_scatter
     }
 
     pub fn render(&self, world: &dyn Hittable) {
@@ -152,7 +161,7 @@ impl Camera {
                 let mut pixel_colour = Colour::zero();
                 for _ in 0..self.samples_per_pixel {
                     let ray = self.get_ray(i, j);
-                    pixel_colour += Self::ray_colour(ray, self.max_depth, world);
+                    pixel_colour += self.ray_colour(ray, self.max_depth, world);
                 }
                 write_colour(pixel_colour * self.pixel_samples_scale);
             }
@@ -175,6 +184,7 @@ impl Default for Camera {
             Vec3::new(0.0, 1.0, 0.0),
             0.0,
             10.0,
+            Colour::zero(),
         )
     }
 }

@@ -3,11 +3,17 @@ use crate::*;
 pub trait Material {
     fn scatter(
         &self,
-        ray_in: &Ray,
-        rec: &HitRecord,
-        attenuation: &mut Colour,
-        scattered: &mut Ray,
-    ) -> bool;
+        _ray_in: &Ray,
+        _rec: &HitRecord,
+        _attenuation: &mut Colour,
+        _scattered: &mut Ray,
+    ) -> bool {
+        false
+    }
+
+    fn emitted(&self, _u: f64, _v: f64, _p: &Point3) -> Colour {
+        Colour::zero()
+    }
 }
 
 pub struct Lambertian {
@@ -120,5 +126,27 @@ impl Material for Dielectric {
 
         *scattered = Ray::new(rec.p, direction, ray_in.time());
         true
+    }
+}
+
+pub struct DiffuseLight {
+    tex: Rc<dyn Texture>,
+}
+
+impl DiffuseLight {
+    pub fn new(tex: Rc<dyn Texture>) -> Self {
+        Self { tex }
+    }
+
+    pub fn from_colour(emit: Colour) -> Self {
+        Self {
+            tex: Rc::new(SolidColour::new(emit)),
+        }
+    }
+}
+
+impl Material for DiffuseLight {
+    fn emitted(&self, u: f64, v: f64, p: &Point3) -> Colour {
+        self.tex.value(u, v, p)
     }
 }
