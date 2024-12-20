@@ -16,6 +16,10 @@ impl Vec3 {
         Self::new(0.0, 0.0, 0.0)
     }
 
+    pub fn one() -> Self {
+        Self::new(1.0, 1.0, 1.0)
+    }
+
     pub fn random() -> Self {
         Self::new(random_double(), random_double(), random_double())
     }
