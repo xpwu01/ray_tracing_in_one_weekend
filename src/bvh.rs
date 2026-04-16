@@ -9,9 +9,9 @@ pub struct BVHNode {
 impl BVHNode {
     pub fn new(objects: &mut Vec<Rc<dyn Hittable>>, start: usize, end: usize) -> Self {
         let mut bbox = AABB::empty();
-        for i in start..end {
-            let object_bbox = objects[i].bounding_box();
-            bbox = AABB::from_boxes(&bbox, &object_bbox);
+
+        for object in objects.iter().take(end).skip(start) {
+            bbox = AABB::from_boxes(&bbox, &object.bounding_box());
         }
 
         let axis = bbox.longest_axis();

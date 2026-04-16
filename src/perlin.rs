@@ -10,8 +10,8 @@ pub struct Perlin<const N: usize> {
 impl<const N: usize> Perlin<N> {
     pub fn new() -> Self {
         let mut randvec = [Vec3::zero(); N];
-        for i in 0..N {
-            randvec[i] = Vec3::random_range(-1.0, 1.0).unit_vector();
+        for val in randvec.iter_mut() {
+            *val = Vec3::random_range(-1.0, 1.0).unit_vector();
         }
 
         let mut perm_x = [0; N];
@@ -70,8 +70,8 @@ impl<const N: usize> Perlin<N> {
     }
 
     fn perlin_generate_perm(perm: &mut [i32; N]) {
-        for i in 0..N {
-            perm[i] = i as i32;
+        for (i, val) in perm.iter_mut().enumerate() {
+            *val = i as i32;
         }
 
         Self::permute(perm);
@@ -91,18 +91,24 @@ impl<const N: usize> Perlin<N> {
 
         let mut accum = 0.0;
 
-        for i in 0..2 {
-            for j in 0..2 {
-                for k in 0..2 {
+        for (i, cjk) in c.iter().enumerate() {
+            for (j, ck) in cjk.iter().enumerate() {
+                for (k, cval) in ck.iter().enumerate() {
                     let weight_v = Vec3::new(u - i as f64, v - j as f64, w - k as f64);
                     accum += (i as f64 * uu + (1 - i) as f64 * (1.0 - uu))
                         * (j as f64 * vv + (1 - j) as f64 * (1.0 - vv))
                         * (k as f64 * ww + (1 - k) as f64 * (1.0 - ww))
-                        * c[i][j][k].dot(weight_v);
+                        * cval.dot(weight_v);
                 }
             }
         }
 
         accum
+    }
+}
+
+impl<const N: usize> Default for Perlin<N> {
+    fn default() -> Self {
+        Self::new()
     }
 }

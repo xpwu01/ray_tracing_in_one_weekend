@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{Interval, Point3, Ray, Vec3};
 
 #[derive(Clone, Copy, Debug)]
 pub struct AABB {
@@ -8,6 +8,7 @@ pub struct AABB {
 }
 
 impl AABB {
+    #[must_use]
     pub fn new(x: &Interval, y: &Interval, z: &Interval) -> Self {
         let mut aabb = Self {
             x: *x,
@@ -18,6 +19,7 @@ impl AABB {
         aabb
     }
 
+    #[must_use]
     pub fn empty() -> Self {
         Self {
             x: Interval::empty(),
@@ -26,6 +28,7 @@ impl AABB {
         }
     }
 
+    #[must_use]
     pub fn from_points(a: &Point3, b: &Point3) -> Self {
         let mut aabb = Self {
             x: Interval::new(a.x().min(b.x()), a.x().max(b.x())),
@@ -36,6 +39,7 @@ impl AABB {
         aabb
     }
 
+    #[must_use]
     pub fn from_boxes(a: &AABB, b: &AABB) -> Self {
         Self {
             x: Interval::enclosing(&a.x, &b.x),
@@ -44,6 +48,7 @@ impl AABB {
         }
     }
 
+    #[must_use]
     pub fn axis_interval(&self, axis: usize) -> &Interval {
         match axis {
             1 => &self.y,
@@ -52,6 +57,7 @@ impl AABB {
         }
     }
 
+    #[must_use]
     pub fn hit(&self, ray: &Ray, mut ray_t: Interval) -> bool {
         let ray_origin = ray.origin();
         let ray_direction = ray.direction();
@@ -85,23 +91,16 @@ impl AABB {
         true
     }
 
+    #[must_use]
     pub fn longest_axis(&self) -> usize {
         let x_size = self.x.size();
         let y_size = self.y.size();
         let z_size = self.z.size();
 
         if x_size > y_size {
-            if x_size > z_size {
-                0
-            } else {
-                2
-            }
+            if x_size > z_size { 0 } else { 2 }
         } else {
-            if y_size > z_size {
-                1
-            } else {
-                2
-            }
+            if y_size > z_size { 1 } else { 2 }
         }
     }
 

@@ -1,3 +1,4 @@
+#[warn(clippy::pedantic)]
 pub mod aabb;
 pub mod bvh;
 pub mod camera;
