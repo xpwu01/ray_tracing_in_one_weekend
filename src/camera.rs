@@ -154,21 +154,18 @@ impl Camera {
     }
 
     pub fn render(&self, world: &dyn Hittable) {
-        println!("P3\n{} {}\n255", self.image_width, self.image_height);
+        let mut imgbuf = image::ImageBuffer::new(self.image_width, self.image_height);
 
-        for j in 0..self.image_height {
-            eprintln!("\rScanlines remaining: {}", self.image_height - j);
-            for i in 0..self.image_width {
-                let mut pixel_colour = Colour::zero();
-                for _ in 0..self.samples_per_pixel {
-                    let ray = self.get_ray(i, j);
-                    pixel_colour += self.ray_colour(ray, self.max_depth, world);
-                }
-                write_colour(pixel_colour * self.pixel_samples_scale);
+        imgbuf.enumerate_pixels_mut().for_each(|(i, j, pixel)| {
+            let mut pixel_colour = Colour::zero();
+            for _ in 0..self.samples_per_pixel {
+                let ray = self.get_ray(i, j);
+                pixel_colour += self.ray_colour(ray, self.max_depth, world);
             }
-        }
+            write_colour(pixel, pixel_colour * self.pixel_samples_scale);
+        });
 
-        eprintln!("\rDone.");
+        imgbuf.save("scene.png").expect("Oops...");
     }
 }
 
