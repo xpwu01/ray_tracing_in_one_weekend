@@ -1,6 +1,6 @@
 use crate::*;
 
-pub trait Material {
+pub trait Material: Send + Sync {
     fn scatter(
         &self,
         _ray_in: &Ray,
@@ -17,17 +17,17 @@ pub trait Material {
 }
 
 pub struct Lambertian {
-    texture: Rc<dyn Texture>,
+    texture: Arc<dyn Texture>,
 }
 
 impl Lambertian {
-    pub fn new(texture: Rc<dyn Texture>) -> Self {
+    pub fn new(texture: Arc<dyn Texture>) -> Self {
         Self { texture }
     }
 
     pub fn from_colour(colour: Colour) -> Self {
         Self {
-            texture: Rc::new(SolidColour::new(colour)),
+            texture: Arc::new(SolidColour::new(colour)),
         }
     }
 }
@@ -130,17 +130,17 @@ impl Material for Dielectric {
 }
 
 pub struct DiffuseLight {
-    tex: Rc<dyn Texture>,
+    tex: Arc<dyn Texture>,
 }
 
 impl DiffuseLight {
-    pub fn new(tex: Rc<dyn Texture>) -> Self {
+    pub fn new(tex: Arc<dyn Texture>) -> Self {
         Self { tex }
     }
 
     pub fn from_colour(emit: Colour) -> Self {
         Self {
-            tex: Rc::new(SolidColour::new(emit)),
+            tex: Arc::new(SolidColour::new(emit)),
         }
     }
 }
@@ -152,17 +152,17 @@ impl Material for DiffuseLight {
 }
 
 pub struct Isotropic {
-    tex: Rc<dyn Texture>,
+    tex: Arc<dyn Texture>,
 }
 
 impl Isotropic {
-    pub fn new(tex: Rc<dyn Texture>) -> Self {
+    pub fn new(tex: Arc<dyn Texture>) -> Self {
         Self { tex }
     }
 
     pub fn from_colour(colour: Colour) -> Self {
         Self {
-            tex: Rc::new(SolidColour::new(colour)),
+            tex: Arc::new(SolidColour::new(colour)),
         }
     }
 }

@@ -3,12 +3,12 @@ use crate::*;
 pub struct Sphere {
     centre: Ray,
     radius: f64,
-    material: Rc<dyn Material>,
+    material: Arc<dyn Material>,
     bbox: AABB,
 }
 
 impl Sphere {
-    pub fn new(centre1: Point3, centre2: Point3, radius: f64, material: Rc<dyn Material>) -> Self {
+    pub fn new(centre1: Point3, centre2: Point3, radius: f64, material: Arc<dyn Material>) -> Self {
         let radius = radius.max(0.0);
         let rvec = Vec3::new(radius, radius, radius);
         let centre = Ray::new(centre1, centre2 - centre1, 0.0);

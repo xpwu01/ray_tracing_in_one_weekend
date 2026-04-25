@@ -3,15 +3,15 @@ use core::f64;
 use crate::*;
 
 pub struct ConstantMedium {
-    boundary: Rc<dyn Hittable>,
+    boundary: Arc<dyn Hittable>,
     neg_inv_density: f64,
-    phase_function: Rc<dyn Material>,
+    phase_function: Arc<dyn Material>,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Rc<dyn Hittable>, density: f64, tex: Rc<dyn Texture>) -> Self {
+    pub fn new(boundary: Arc<dyn Hittable>, density: f64, tex: Arc<dyn Texture>) -> Self {
         let neg_inv_density = -1.0 / density;
-        let phase_function = Rc::new(Isotropic::new(tex));
+        let phase_function = Arc::new(Isotropic::new(tex));
 
         Self {
             boundary,
@@ -20,9 +20,9 @@ impl ConstantMedium {
         }
     }
 
-    pub fn with_colour(boundary: Rc<dyn Hittable>, density: f64, colour: Colour) -> Self {
+    pub fn with_colour(boundary: Arc<dyn Hittable>, density: f64, colour: Colour) -> Self {
         let neg_inv_density = -1.0 / density;
-        let phase_function = Rc::new(Isotropic::from_colour(colour));
+        let phase_function = Arc::new(Isotropic::from_colour(colour));
 
         Self {
             boundary,

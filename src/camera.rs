@@ -1,4 +1,5 @@
 use crate::*;
+use rayon::iter::ParallelIterator;
 
 pub struct Camera {
     pub aspect_ratio: f64,
@@ -156,7 +157,7 @@ impl Camera {
     pub fn render(&self, world: &dyn Hittable) {
         let mut imgbuf = image::ImageBuffer::new(self.image_width, self.image_height);
 
-        imgbuf.enumerate_pixels_mut().for_each(|(i, j, pixel)| {
+        imgbuf.par_enumerate_pixels_mut().for_each(|(i, j, pixel)| {
             let mut pixel_colour = Colour::zero();
             for _ in 0..self.samples_per_pixel {
                 let ray = self.get_ray(i, j);

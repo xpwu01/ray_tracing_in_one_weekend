@@ -34,7 +34,7 @@ pub use texture::*;
 pub use vec3::*;
 
 pub use std::f64::consts::PI;
-pub use std::rc::Rc;
+pub use std::sync::Arc;
 
 pub fn degrees_to_radians(degrees: f64) -> f64 {
     degrees * PI / 180.0

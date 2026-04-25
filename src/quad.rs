@@ -5,14 +5,14 @@ pub struct Quad {
     u: Vec3,
     v: Vec3,
     w: Vec3,
-    material: Rc<dyn Material>,
+    material: Arc<dyn Material>,
     bbox: AABB,
     normal: Vec3,
     d: f64,
 }
 
 impl Quad {
-    pub fn new(q: Point3, u: Vec3, v: Vec3, material: Rc<dyn Material>) -> Self {
+    pub fn new(q: Point3, u: Vec3, v: Vec3, material: Arc<dyn Material>) -> Self {
         let bbox = AABB::empty();
         let n = u.cross(v);
         let normal = n.unit_vector();
@@ -51,7 +51,7 @@ impl Quad {
         true
     }
 
-    pub fn block(a: &Point3, b: &Point3, material: Rc<dyn Material>) -> Rc<HittableList> {
+    pub fn block(a: &Point3, b: &Point3, material: Arc<dyn Material>) -> Arc<HittableList> {
         let mut sides = HittableList::empty();
 
         let min = Point3::new(a.x().min(b.x()), a.y().min(b.y()), a.z().min(b.z()));
@@ -61,44 +61,44 @@ impl Quad {
         let dy = Vec3::new(0.0, max.y() - min.y(), 0.0);
         let dz = Vec3::new(0.0, 0.0, max.z() - min.z());
 
-        sides.add(Rc::new(Quad::new(
+        sides.add(Arc::new(Quad::new(
             Point3::new(min.x(), min.y(), max.z()),
             dx,
             dy,
             material.clone(),
         )));
-        sides.add(Rc::new(Quad::new(
+        sides.add(Arc::new(Quad::new(
             Point3::new(max.x(), min.y(), max.z()),
             -dz,
             dy,
             material.clone(),
         )));
-        sides.add(Rc::new(Quad::new(
+        sides.add(Arc::new(Quad::new(
             Point3::new(max.x(), min.y(), min.z()),
             -dx,
             dy,
             material.clone(),
         )));
-        sides.add(Rc::new(Quad::new(
+        sides.add(Arc::new(Quad::new(
             Point3::new(min.x(), min.y(), min.z()),
             dz,
             dy,
             material.clone(),
         )));
-        sides.add(Rc::new(Quad::new(
+        sides.add(Arc::new(Quad::new(
             Point3::new(min.x(), max.y(), max.z()),
             dx,
             -dz,
             material.clone(),
         )));
-        sides.add(Rc::new(Quad::new(
+        sides.add(Arc::new(Quad::new(
             Point3::new(min.x(), min.y(), min.z()),
             dx,
             dz,
             material.clone(),
         )));
 
-        Rc::new(sides)
+        Arc::new(sides)
     }
 }
 

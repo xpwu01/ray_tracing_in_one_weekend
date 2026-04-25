@@ -4,7 +4,7 @@ use crate::*;
 pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
-    pub material: Rc<dyn Material>,
+    pub material: Arc<dyn Material>,
     pub t: f64,
     pub u: f64,
     pub v: f64,
@@ -16,7 +16,7 @@ impl HitRecord {
         Self {
             p: Vec3::zero(),
             normal: Vec3::zero(),
-            material: Rc::new(Lambertian::from_colour(Colour::zero())),
+            material: Arc::new(Lambertian::from_colour(Colour::zero())),
             t: 0.0,
             u: 0.0,
             v: 0.0,
@@ -40,19 +40,19 @@ impl Default for HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Send + Sync {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
     fn bounding_box(&self) -> AABB;
 }
 
 pub struct Translate {
-    object: Rc<dyn Hittable>,
+    object: Arc<dyn Hittable>,
     offset: Vec3,
     bbox: AABB,
 }
 
 impl Translate {
-    pub fn new(object: Rc<dyn Hittable>, offset: Vec3) -> Self {
+    pub fn new(object: Arc<dyn Hittable>, offset: Vec3) -> Self {
         let bbox = object.bounding_box() + offset;
         Self {
             object,
@@ -81,14 +81,14 @@ impl Hittable for Translate {
 }
 
 pub struct RotateY {
-    object: Rc<dyn Hittable>,
+    object: Arc<dyn Hittable>,
     sin_theta: f64,
     cos_theta: f64,
     bbox: AABB,
 }
 
 impl RotateY {
-    pub fn new(object: Rc<dyn Hittable>, angle: f64) -> Self {
+    pub fn new(object: Arc<dyn Hittable>, angle: f64) -> Self {
         let radians = degrees_to_radians(angle);
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();

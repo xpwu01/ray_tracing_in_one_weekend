@@ -1,13 +1,13 @@
 use crate::*;
 
 pub struct BVHNode {
-    left: Rc<dyn Hittable>,
-    right: Rc<dyn Hittable>,
+    left: Arc<dyn Hittable>,
+    right: Arc<dyn Hittable>,
     bbox: AABB,
 }
 
 impl BVHNode {
-    pub fn new(objects: &mut Vec<Rc<dyn Hittable>>, start: usize, end: usize) -> Self {
+    pub fn new(objects: &mut Vec<Arc<dyn Hittable>>, start: usize, end: usize) -> Self {
         let mut bbox = AABB::empty();
 
         for object in objects.iter().take(end).skip(start) {
@@ -32,8 +32,8 @@ impl BVHNode {
                     }
                 });
                 let mid = start + object_span / 2;
-                let left: Rc<dyn Hittable> = Rc::new(BVHNode::new(objects, start, mid));
-                let right: Rc<dyn Hittable> = Rc::new(BVHNode::new(objects, mid, end));
+                let left: Arc<dyn Hittable> = Arc::new(BVHNode::new(objects, start, mid));
+                let right: Arc<dyn Hittable> = Arc::new(BVHNode::new(objects, mid, end));
                 (left, right)
             }
         };
@@ -47,7 +47,7 @@ impl BVHNode {
         Self::new(&mut objects, 0, end)
     }
 
-    fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis: usize) -> std::cmp::Ordering {
+    fn box_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>, axis: usize) -> std::cmp::Ordering {
         let box_a = a.bounding_box();
         let box_b = b.bounding_box();
         let a_axis_interval = &box_a.axis_interval(axis);
@@ -58,15 +58,15 @@ impl BVHNode {
             .unwrap()
     }
 
-    fn box_x_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>) -> std::cmp::Ordering {
+    fn box_x_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>) -> std::cmp::Ordering {
         Self::box_compare(a, b, 0)
     }
 
-    fn box_y_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>) -> std::cmp::Ordering {
+    fn box_y_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>) -> std::cmp::Ordering {
         Self::box_compare(a, b, 1)
     }
 
-    fn box_z_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>) -> std::cmp::Ordering {
+    fn box_z_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>) -> std::cmp::Ordering {
         Self::box_compare(a, b, 2)
     }
 }

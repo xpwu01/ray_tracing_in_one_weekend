@@ -1,12 +1,12 @@
 use crate::*;
 
 pub struct HittableList {
-    pub objects: Vec<Rc<dyn Hittable>>,
+    pub objects: Vec<Arc<dyn Hittable>>,
     bbox: AABB,
 }
 
 impl HittableList {
-    pub fn new(object: Rc<dyn Hittable>) -> Self {
+    pub fn new(object: Arc<dyn Hittable>) -> Self {
         let bbox = AABB::from_boxes(&AABB::empty(), &object.bounding_box());
         let objects = vec![object];
         Self { objects, bbox }
@@ -19,7 +19,7 @@ impl HittableList {
         }
     }
 
-    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+    pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.bbox = AABB::from_boxes(&self.bbox, &object.bounding_box());
         self.objects.push(object);
     }
